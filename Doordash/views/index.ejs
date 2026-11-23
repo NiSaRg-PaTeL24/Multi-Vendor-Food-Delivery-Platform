@@ -1,0 +1,23 @@
+<h2>Available Foods (DoorDash)</h2>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Restaurant</th>
+        <th>Price</th>
+        <th>Available</th>
+        <th>Action</th>
+    </tr>
+    <% foods.forEach(food => { %>
+    <tr>
+        <td><%= food.name %></td>
+        <td><%= food.restaurant %></td>
+        <td>$<%= food.price %></td>
+        <td><%= food.available ? "✅ Yes" : "❌ No" %></td>
+        <td>
+            <form action="/delete-food/<%= food._id %>" method="POST">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    <% }); %>
+</table>

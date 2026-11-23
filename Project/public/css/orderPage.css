@@ -1,0 +1,152 @@
+/* Additional styles for the order status */
+.order-status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-left: 10px;
+    float: right;
+}
+
+.status-paid {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.status-cancelled {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+.status-delivered {
+    background-color: #e8f5e9;
+    color: #388e3c;
+}
+
+.status-pending {
+    background-color: #fff8e1;
+    color: #ffa000;
+}
+
+.order-card.cancelled {
+    opacity: 0.8;
+    background-color: #f9f9f9;
+    border-left: 4px solid #d32f2f;
+}
+
+.order-actions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.order-info {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+    text-align: left;
+}
+
+
+.cancel-order-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.cancel-order-btn:hover {
+    background-color: #d32f2f;
+}
+
+.cancel-order-btn:disabled {
+    background-color: #ddd;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.order-card {
+    transition: all 0.3s ease;
+}
+
+/* New styles for order details with tax */
+.order-financial-details {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin: 15px 0;
+}
+
+.order-financial-details .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 14px;
+}
+
+.order-financial-details .subtotal-row,
+.order-financial-details .tax-row {
+    color: #666;
+    border-bottom: 1px solid #eee;
+}
+
+.order-financial-details .total-row {
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+    margin-top: 5px;
+}
+
+.order-financial-details .tax-badge {
+    background-color: #e8f5e9;
+    color: #388e3c;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 5px;
+}
+
+/* Orders Page Styles */
+.orders-container {
+    padding: 20px;
+    max-width: 900px;
+    margin: 20px auto;
+}
+
+.order-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.order-card h3 {
+    margin: 0;
+    text-align: left;
+}
+
+.items-list {
+    margin-top: 10px;
+    text-align: left;
+}
+
+.items-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.items-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.hidden {
+    display: none;
+}

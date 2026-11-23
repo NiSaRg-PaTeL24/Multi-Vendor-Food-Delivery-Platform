@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/profilePage.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">FoodDelivery</div>
+        <ul class="nav-links">
+            <li><a href="/home">Home</a></li>
+            <li><a href="/orders">Orders</a></li>
+            <li><a href="/profile">Profile</a></li>
+            <li><a href="/logout" id="logout-btn">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <% if (user.profilePicture) { %>
+                    <img src="<%= user.profilePicture %>" alt="<%= user.username %>">
+                <% } else { %>
+                    <%= user.username.charAt(0).toUpperCase() %>
+                <% } %>
+            </div>
+            <div class="profile-name">
+                <h2>
+                    <!-- <%= user.username %> -->
+                    <%= auth0User.nickname.charAt(0).toUpperCase() + auth0User.nickname.slice(1) %>
+
+                    <% if (user.authProvider === 'auth0') { %>
+                        <span class="auth0-badge">Auth0</span>
+                    <% } %>
+                </h2>
+                <!-- <div class="profile-email"><%= user.email %></div> -->
+            </div>
+        </div>
+
+        <div class="profile-details">
+            <div class="detail-card">
+                <h3>Account Information</h3>
+                <div class="detail-row">
+                    <div class="detail-label">Username:</div>
+                    <!-- <div class="detail-value"><%= user.username %></div> -->
+                    <div class="detail-value"><%= auth0User.nickname %></div>
+
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Email:</div>
+                    <div class="detail-value"><%= user.email %></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Account Type:</div>
+                    <div class="detail-value">
+                        <% if (user.authProvider === 'auth0') { %>
+                            Auth0 Account
+                        <% } else { %>
+                            Local Account
+                        <% } %>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Joined:</div>
+                    <div class="detail-value"><%= new Date(user.createdAt).toLocaleDateString() %></div>
+                </div>
+            </div>
+
+            <!-- <% if (user.authProvider === 'auth0' && auth0User) { %>
+            <div class="auth0-info">
+                <h3>Auth0 Identity Information</h3>
+                <div class="detail-row">
+                    <div class="detail-label">Auth0 ID:</div>
+                    <div class="detail-value"><%= auth0User.sub %></div>
+                </div>
+                <% if (auth0User.nickname) { %>
+                <div class="detail-row">
+                    <div class="detail-label">Nickname:</div>
+                    <div class="detail-value"><%= auth0User.nickname %></div>
+                </div>
+                <% } %>
+                <% if (auth0User.updated_at) { %>
+                <div class="detail-row">
+                    <div class="detail-label">Last Updated:</div>
+                    <div class="detail-value"><%= new Date(auth0User.updated_at).toLocaleString() %></div>
+                </div>
+                <% } %>
+            </div>
+            <% } %> -->
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 FoodDelivery. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

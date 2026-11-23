@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Orders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/orderPage.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">FoodDelivery</div>
+        <ul class="nav-links">
+            <li><a href="/home">Home</a></li>
+            <li><a href="/orders" class="active">Orders</a></li>
+            <li class="user-dropdown">
+                <a href="#" class="user-dropdown-toggle">
+                    <% if (user.profilePicture) { %>
+                        <img src="<%= user.profilePicture %>" alt="<%= user.username %>" class="user-avatar">
+                        <% } else { %>
+                            <span class="user-avatar-text">
+                                <%= user.username.charAt(0).toUpperCase() %>
+                            </span>
+                            <% } %>
+                                <span class="username-display">
+                                    <%= user.username %>
+                                </span>
+                                <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="dropdown-content">
+                    <a href="/profile"><i class="fas fa-user"></i> Profile</a>
+                    <a href="/orders"><i class="fas fa-clipboard-list"></i> Orders</a>
+                    <a href="/logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Orders Section -->
+    <div class="orders-container">
+        <h2>Your Orders</h2>
+        <% if (orders.length> 0) { %>
+            <% orders.forEach(order=> { %>
+                <div class="order-card <%= order.status === 'cancelled' ? 'cancelled' : '' %>"
+                    id="order-<%= order._id %>">
+                    <h3>
+                        Order ID: <%= order._id %>
+                            <span class="order-status status-<%= order.status %>">
+                                <%= order.status %>
+                            </span>
+                    </h3>
+                    <p class="order-info">Ordered On: <%= order.createdAt.toDateString() %>
+                    </p>
+
+                    <!-- Order Items -->
+                    <div class="items-list">
+                        <h4>Order List:</h4>
+                        <ul>
+                            <% order.items.forEach(item=> { %>
+                                <li>
+                                    <strong>
+                                        <%= item.name %>
+                                    </strong> x <%= item.quantity %>
+                                        - $<%= (item.price * item.quantity).toFixed(2) %>
+                                </li>
+                                <% }) %>
+                        </ul>
+                    </div>
+
+                    <!-- Financial details section with tax -->
+                    <!-- In orders.ejs template -->
+                    <div class="order-financial-details">
+                        <div class="detail-row subtotal-row">
+                            <span>Subtotal:</span>
+                            <% if (order.subtotal !== undefined) { %>
+                                <span>$<%= order.subtotal.toFixed(2) %></span>
+                            <% } else { %>
+                                <!-- For backward compatibility with orders before tax implementation -->
+                                <span>$<%= (order.total / 1.13).toFixed(2) %></span>
+                            <% } %>
+                        </div>
+                        <div class="detail-row tax-row">
+                            <span>Tax:</span>
+                            <% if (order.tax !== undefined) { %>
+                                <span>$<%= order.tax.toFixed(2) %></span>
+                            <% } else { %>
+                                <!-- For backward compatibility with orders before tax implementation -->
+                                <span>$<%= (order.total - (order.total / 1.13)).toFixed(2) %></span>
+                            <% } %>
+                        </div>
+                        <% if (order.discount !== undefined && order.discount > 0) { %>
+                        <div class="detail-row discount-row">
+                            <span>Discount:</span>
+                            <span>-$<%= order.discount.toFixed(2) %></span>
+                        </div>
+                        <% } %>
+                        <% if (order.deliveryCharge !== undefined && order.deliveryCharge > 0) { %>
+                        <div class="detail-row delivery-row">
+                            <span>Delivery Fee:</span>
+                            <span>$<%= order.deliveryCharge.toFixed(2) %></span>
+                        </div>
+                        <% } %>
+                        <div class="detail-row total-row">
+                            <span>Total:</span>
+                            <span>$<%= order.total.toFixed(2) %></span>
+                        </div>
+                    </div>
+
+                    <!-- Cancel Order Button - Only show for active orders -->
+                    <% if (order.status !=='cancelled' && order.status !=='delivered' ) { %>
+                        <div class="order-actions">
+                            <button class="cancel-order-btn" data-order-id="<%= order._id %>">Cancel Order</button>
+                        </div>
+                        <% } %>
+                </div>
+                <% }) %>
+                    <% } else { %>
+                        <p>No orders yet. Start browsing our menu and place your first order!</p>
+                        <% } %>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 FoodDelivery. All rights reserved.</p>
+    </footer>
+
+    <!-- Script -->
+    <script>
+        // Handle Cancel Order Button Click
+        document.querySelectorAll('.cancel-order-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const orderId = button.getAttribute('data-order-id');
+                const orderCard = document.getElementById(`order-${orderId}`);
+
+                if (confirm('Are you sure you want to cancel this order?')) {
+                    try {
+                        const response = await fetch(`/cancel-order/${orderId}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            // Don't remove the order, just update its appearance
+                            orderCard.classList.add('cancelled');
+
+                            // Update the status badge
+                            const statusBadge = orderCard.querySelector('.order-status');
+                            statusBadge.className = 'order-status status-cancelled';
+                            statusBadge.textContent = 'cancelled';
+
+                            // Remove the cancel button
+                            const orderActions = orderCard.querySelector('.order-actions');
+                            if (orderActions) {
+                                orderActions.remove();
+                            }
+
+                            alert('Order canceled successfully!');
+                        } else {
+                            alert(`Failed to cancel order: ${data.error}`);
+                        }
+                    } catch (error) {
+                        console.error('Error canceling order:', error);
+                        alert('Failed to cancel order. Please try again.');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

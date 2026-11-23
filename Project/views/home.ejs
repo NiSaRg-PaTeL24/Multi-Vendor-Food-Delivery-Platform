@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/homePage.css">
+    <!-- Only load the Stripe script, don't initialize it yet -->
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">FoodDelivery</div>
+        <ul class="nav-links">
+            <li><a href="/home" class="active">Home</a></li>
+            <li><a href="/orders">Orders</a></li>
+            <li class="user-dropdown">
+                <a href="#" class="user-dropdown-toggle">
+                    <% if (user.profilePicture) { %>
+                        <img src="<%= user.profilePicture %>" alt="<%= user.username %>" class="user-avatar">
+                        <% } else { %>
+                            <span class="user-avatar-text">
+                                <%= user.username.charAt(0).toUpperCase() %>
+                            </span>
+                            <% } %>
+                                <span class="username-display">
+                                    <%= user.username %>
+                                </span>
+                                <i class="fas fa-chevron-down"></i>
+                </a>
+                <div class="dropdown-content">
+                    <a href="/profile"><i class="fas fa-user"></i> Profile</a>
+                    <a href="/orders"><i class="fas fa-clipboard-list"></i> Orders</a>
+                    <a href="/logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <h2>Welcome, <%= username %>!</h2>
+        <p>Explore our delicious food delivery services.</p>
+
+        <!-- Food List -->
+        <div class="food-list" id="food-list">
+            <% foods.forEach(food=> { if (food.available) { %>
+                <div class="food-item">
+                    <p>   
+                        <span class="badge"><%= food.appClient %></span>
+                    </p>
+                    <h3>
+                        <%= food.name %>    
+                    </h3>
+                    <p>by
+                        <%= food.restaurant %>
+                    </p>
+                    
+                    
+                    <p>
+                        Price: $<%= food.price %>
+                    </p>
+                    
+                    <button class="add-to-cart" data-id="<%= food._id %>" data-restaurant="<%= food.restaurant %>"
+                        data-name="<%= food.name %>" data-price="<%= food.price %>">
+                        Add to Cart
+                    </button>
+                </div>
+                <% } }) %>
+        </div>
+
+
+        <!-- Cart Section - Redesigned with Tax -->
+        <div id="cart" class="cart-container">
+            <div class="cart-header">
+                <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
+                <span class="cart-counter" id="cart-count">0</span>
+            </div>
+            <div class="cart-items-container">
+                <ul id="cart-items" class="cart-items-list"></ul>
+                <div class="cart-empty-message" id="cart-empty">
+                    <i class="fas fa-shopping-basket"></i>
+                    <p>Your cart is empty</p>
+                    <span>Add delicious items to get started!</span>
+                </div>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total-details">
+                    <div class="subtotal-row">
+                        <span>Subtotal:</span>
+                        <span id="cart-subtotal">$0.00</span>
+                    </div>
+                    <div class="tax-row">
+                        <span>Tax (<span id="cart-tax-rate"><%= taxRate %></span>%):</span>
+                        <span id="cart-tax">$0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Total:</span>
+                        <span class="total-price">$<span id="total-price">0.00</span></span>
+                    </div>
+                </div>
+                <button id="checkout-btn" class="checkout-button" disabled>
+                    <i class="fas fa-lock"></i> Checkout
+                </button>
+            </div>
+        </div>
+
+        <!-- Services -->
+        <div class="service-info">
+            <h3>Our Services</h3>
+            <p>We deliver food from top restaurants right to your doorstep. Choose from a variety of cuisines and enjoy
+                fast and reliable delivery.</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="card">
+                <i class="fas fa-utensils"></i>
+                <h4>500+</h4>
+                <p>Restaurants</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-truck"></i>
+                <h4>10,000+</h4>
+                <p>Orders Delivered</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-user"></i>
+                <h4>50,000+</h4>
+                <p>Happy Customers</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal - Redesigned with Tax, Discount, and Delivery Fee -->
+    <div class="modal" id="payment-modal">
+        <div class="modal-content payment-modal-content">
+            <span class="close-modal">&times;</span>
+
+            <div class="payment-header">
+                <i class="fas fa-receipt"></i>
+                <h2>Complete Your Order</h2>
+            </div>
+
+            <div class="payment-columns">
+                <!-- Left Column - Order Summary -->
+                <div id="order-summary" class="order-summary-column">
+                    <div class="summary-header">
+                        <h3>Order Summary</h3>
+                        <span class="summary-items-count" id="summary-count">0 items</span>
+                    </div>
+                    <ul id="order-items" class="order-items-list"></ul>
+                    <div class="summary-totals">
+                        <div class="subtotal-row">
+                            <span>Subtotal</span>
+                            <span id="subtotal-amount">$0.00</span>
+                        </div>
+                        <div class="tax-row">
+                            <span>Tax (<span id="tax-rate">13</span>%)</span>
+                            <span id="tax-amount">$0.00</span>
+                        </div>
+                        <div class="discount-row" id="discount-row" style="display: none;">
+                            <span>Discount <span id="discount-label">(10% off orders over $100)</span></span>
+                            <span id="discount-amount">-$0.00</span>
+                        </div>
+                        <div class="delivery-row" id="delivery-row" style="display: none;">
+                            <span>Delivery Fee</span>
+                            <span id="delivery-amount">$0.00</span>
+                        </div>
+                        <div class="total-row">
+                            <span>Total</span>
+                            <span class="total-amount">$<span id="order-total">0</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Payment Form -->
+                <div id="payment-form-container" class="payment-form-column">
+                    <div class="payment-form-header">
+                        <h3>Payment Details</h3>
+                        <div class="secure-payment">
+                            <i class="fas fa-shield-alt"></i> Secure Payment
+                        </div>
+                    </div>
+                    <form id="payment-form">
+                        <div class="form-row card-input-container">
+                            <label for="card-element">
+                                <i class="far fa-credit-card"></i> Card Information
+                            </label>
+                            <div id="card-element" class="card-element-container">
+                                <!-- Stripe Element will be inserted here -->
+                            </div>
+                            <div id="card-errors" role="alert" class="card-errors"></div>
+                        </div>
+                        <button id="pay-button" class="pay-button">
+                            <i class="fas fa-lock"></i>
+                            <span id="button-text">Pay $<span id="pay-button-amount">0</span></span>
+                            <span id="spinner" class="spinner hidden"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <div id="payment-success" style="display: none;" class="payment-success">
+                <div class="success-icon-container">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Payment Successful!</h3>
+                <p>Your order has been placed and will be delivered soon.</p>
+                <button id="view-orders-btn" class="view-orders-button">
+                    <i class="fas fa-clipboard-list"></i> View My Orders
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 FoodDelivery. All rights reserved.</p>
+    </footer>
+
+    <!-- Script -->
+    <script>
+        // Initialize variables but don't create Stripe instance yet
+        let stripe = null;
+        let elements = null;
+        let cardElement = null;
+        let paymentIntentClientSecret = null;
+        let paymentIntentId = null;
+
+        // Existing cart functionality
+        let cart = [];
+
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', () => {
+                const id = button.getAttribute('data-id');
+                const name = button.getAttribute('data-name');
+                const restaurant = button.getAttribute('data-restaurant');
+                const price = parseFloat(button.getAttribute('data-price'));
+
+                const existingItem = cart.find(item => item.id === id);
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({ id, name, restaurant, price, quantity: 1 });
+                }
+                updateCart();
+            });
+        });
+
+        function updateCart() {
+            const cartList = document.getElementById('cart-items');
+            const totalPriceEl = document.getElementById('total-price');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            const cartEmptyMessage = document.getElementById('cart-empty');
+            const cartCountEl = document.getElementById('cart-count');
+            const cartSubtotalEl = document.getElementById('cart-subtotal');
+            const cartTaxEl = document.getElementById('cart-tax');
+            const cartTaxRateEl = document.getElementById('cart-tax-rate');
+
+            cartList.innerHTML = '';
+            let subtotal = 0;
+            let itemCount = 0;
+
+            cart.forEach((item, index) => {
+                subtotal += item.price * item.quantity;
+                itemCount += item.quantity;
+
+                const li = document.createElement('li');
+                li.className = 'cart-item';
+                li.innerHTML = `
+                    <div class="cart-item-details">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-restaurant">${item.restaurant}</div>
+                    </div>
+                    <div class="cart-item-price">$${(item.price).toFixed(2)}</div>
+                    <div class="cart-item-controls">
+                        <button class="quantity-btn" onclick="decreaseQuantity(${index})">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <span class="item-quantity">${item.quantity}</span>
+                        <button class="quantity-btn" onclick="increaseQuantity(${index})">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="cart-item-subtotal">$${(item.price * item.quantity).toFixed(2)}</div>
+                    <button class="remove-btn" onclick="removeItem(${index})">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                `;
+                cartList.appendChild(li);
+            });
+
+            // For display purposes, use default tax rate until checkout
+            // The actual values will be fetched from the server during checkout
+            const taxRate = 13.0;
+            const tax = subtotal * (taxRate / 100);
+            const total = subtotal + tax;
+
+            // Update subtotal, tax, and total displays
+            cartSubtotalEl.innerText = `$${subtotal.toFixed(2)}`;
+            cartTaxRateEl.innerText = taxRate;
+            cartTaxEl.innerText = `$${tax.toFixed(2)}`;
+            totalPriceEl.innerText = total.toFixed(2);
+            
+            checkoutBtn.disabled = cart.length === 0;
+
+            // Update item count badge
+            cartCountEl.innerText = itemCount;
+
+            // Show/hide empty cart message
+            if (cart.length === 0) {
+                cartEmptyMessage.style.display = 'flex';
+                cartList.style.display = 'none';
+            } else {
+                cartEmptyMessage.style.display = 'none';
+                cartList.style.display = 'block';
+            }
+        }
+
+        function increaseQuantity(index) {
+            cart[index].quantity += 1;
+            updateCart();
+        }
+
+        function decreaseQuantity(index) {
+            if (cart[index].quantity > 1) {
+                cart[index].quantity -= 1;
+            } else {
+                cart.splice(index, 1);
+            }
+            updateCart();
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        // Modal handling
+        const modal = document.getElementById('payment-modal');
+        const closeModal = document.querySelector('.close-modal');
+        const checkoutBtn = document.getElementById('checkout-btn');
+
+        checkoutBtn.addEventListener('click', async () => {
+            // Initialize Stripe only when checkout is clicked
+            if (!stripe) {
+                stripe = Stripe("<%= stripePublicKey %>");
+                elements = stripe.elements();
+                cardElement = elements.create('card');
+            }
+
+            // Update order summary in modal
+            const orderItems = document.getElementById('order-items');
+            const orderTotal = document.getElementById('order-total');
+            const summaryCount = document.getElementById('summary-count');
+            const subtotalAmount = document.getElementById('subtotal-amount');
+            const taxAmount = document.getElementById('tax-amount');
+            const taxRate = document.getElementById('tax-rate');
+            const discountRow = document.getElementById('discount-row');
+            const discountAmount = document.getElementById('discount-amount');
+            const discountLabel = document.getElementById('discount-label');
+            const deliveryRow = document.getElementById('delivery-row');
+            const deliveryAmount = document.getElementById('delivery-amount');
+            const payButtonAmount = document.getElementById('pay-button-amount');
+
+            orderItems.innerHTML = '';
+            let itemCount = 0;
+
+            cart.forEach(item => {
+                itemCount += item.quantity;
+
+                const li = document.createElement('li');
+                li.className = 'order-item';
+                li.innerHTML = `
+                    <div class="order-item-details">
+                        <span class="order-item-name">${item.name}</span>
+                        <span class="order-item-restaurant">${item.restaurant}</span>
+                    </div>
+                    <div class="order-item-quantity">x${item.quantity}</div>
+                    <div class="order-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
+                `;
+                orderItems.appendChild(li);
+            });
+
+            // Create payment intent to get the pricing from server
+            try {
+                const response = await fetch('/create-payment-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cart }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    paymentIntentClientSecret = data.clientSecret;
+
+                    // Update summary display with values from server
+                    summaryCount.textContent = `${itemCount} item${itemCount !== 1 ? 's' : ''}`;
+                    subtotalAmount.textContent = `$${data.subtotal}`;
+                    
+                    // Update tax rate and amount
+                    taxRate.textContent = data.taxRate;
+                    taxAmount.textContent = `$${data.tax}`;
+                    
+                    // Handle discount if applicable
+                    if (parseFloat(data.discount) > 0) {
+                        discountAmount.textContent = `-$${data.discount}`;
+                        discountLabel.textContent = `(${data.discountPercentage || 10}% off orders over $${data.discountThreshold || 100})`;
+                        discountRow.style.display = 'flex';
+                    } else {
+                        discountRow.style.display = 'none';
+                    }
+                    
+                    // Handle delivery charge if applicable
+                    if (parseFloat(data.deliveryCharge) > 0) {
+                        deliveryAmount.textContent = `$${data.deliveryCharge}`;
+                        deliveryRow.style.display = 'flex';
+                    } else {
+                        deliveryRow.style.display = 'none';
+                    }
+                    
+                    // Update total and pay button
+                    orderTotal.textContent = data.amount;
+                    payButtonAmount.textContent = data.amount;
+
+                    // Show the modal and mount card element
+                    modal.style.display = 'flex';
+
+                    // Mount the card element if not already mounted
+                    if (!cardElement.isMount) {
+                        cardElement.mount('#card-element');
+                        cardElement.isMount = true;
+
+                        // Handle card element validation errors
+                        cardElement.on('change', function (event) {
+                            const displayError = document.getElementById('card-errors');
+                            if (event.error) {
+                                displayError.textContent = event.error.message;
+                            } else {
+                                displayError.textContent = '';
+                            }
+                        });
+                    }
+                } else {
+                    alert('Error setting up payment: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error creating payment intent:', error);
+                alert('Payment setup failed. Please try again.');
+            }
+        });
+
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Handle payment submission
+        const paymentForm = document.getElementById('payment-form');
+        const payButton = document.getElementById('pay-button');
+        const buttonText = document.getElementById('button-text');
+        const spinner = document.getElementById('spinner');
+        const paymentSuccess = document.getElementById('payment-success');
+        const paymentFormContainer = document.getElementById('payment-form-container');
+        const orderSummary = document.getElementById('order-summary');
+
+        paymentForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            // Ensure Stripe is initialized
+            if (!stripe) {
+                alert('Payment system not initialized. Please try again.');
+                return;
+            }
+
+            // Disable the submit button to prevent multiple clicks
+            payButton.disabled = true;
+            buttonText.textContent = 'Processing...';
+            spinner.classList.remove('hidden');
+
+            try {
+                const result = await stripe.confirmCardPayment(paymentIntentClientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                    }
+                });
+
+                if (result.error) {
+                    // Show error to customer
+                    const errorElement = document.getElementById('card-errors');
+                    errorElement.textContent = result.error.message;
+
+                    // Re-enable the submit button
+                    payButton.disabled = false;
+                    buttonText.textContent = 'Pay now';
+                    spinner.classList.add('hidden');
+                } else {
+                    if (result.paymentIntent.status === 'succeeded') {
+                        paymentIntentId = result.paymentIntent.id;
+
+                        // Send to server to create order
+                        const response = await fetch('/payment-success', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                paymentIntentId: paymentIntentId,
+                                cart: cart
+                            }),
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            // Hide payment form and show success message
+                            paymentFormContainer.style.display = 'none';
+                            orderSummary.style.display = 'none';
+                            paymentSuccess.style.display = 'block';
+
+                            // Clear cart
+                            cart = [];
+                            updateCart();
+                        } else {
+                            alert('Error processing order: ' + data.error);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error confirming payment:', error);
+                alert('Payment failed. Please try again.');
+
+                // Re-enable the submit button
+                payButton.disabled = false;
+                buttonText.textContent = 'Pay now';
+                spinner.classList.add('hidden');
+            }
+        });
+
+        // View orders button
+        document.getElementById('view-orders-btn').addEventListener('click', () => {
+            window.location.href = '/orders';
+        });
+    </script>
+</body>
+
+</html>

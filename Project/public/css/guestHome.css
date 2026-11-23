@@ -1,0 +1,274 @@
+.guest-banner {
+    background-color: #ff5722;
+    color: white;
+    padding: 100px 20px;
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.guest-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to right, rgba(255, 87, 34, 0.9), rgba(211, 47, 47, 0.9));
+    z-index: 0;
+}
+
+.banner-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.guest-banner h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.guest-banner p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.login-btn {
+    background-color: white;
+    color: #ff5722;
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background-color: #f8f8f8;
+}
+
+.browse-as-guest {
+    margin-top: 15px;
+    color: rgba(255, 255, 255, 0.9);
+    display: block;
+}
+
+.food-item .disabled-btn {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.notification-badge {
+    display: inline-block;
+    background-color: white;
+    color: #ff5722;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    margin-left: 6px;
+}
+
+.guest-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ff5722;
+    padding: 10px 20px;
+    color: white;
+}
+
+.guest-nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.guest-nav-links li {
+    display: inline;
+}
+
+.guest-nav-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+/* Guest Page Styles */
+.guest-banner {
+    background-color: #ff5722;
+    color: white;
+    padding: 100px 20px;
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+    background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+    background-size: cover;
+    background-position: center;
+}
+
+.guest-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to right, rgba(255, 87, 34, 0.9), rgba(211, 47, 47, 0.9));
+    z-index: 0;
+}
+
+.banner-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.guest-banner h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.guest-banner p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.login-btn {
+    background-color: white;
+    color: #ff5722;
+    border: none;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background-color: #f8f8f8;
+}
+
+.browse-as-guest {
+    margin-top: 15px;
+    color: rgba(255, 255, 255, 0.9);
+    display: block;
+}
+
+.food-item .disabled-btn {
+    background-color: #cccccc !important;
+    cursor: not-allowed !important;
+}
+
+.notification-badge {
+    display: inline-block;
+    background-color: white;
+    color: #ff5722;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    margin-left: 6px;
+}
+
+.guest-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ff5722;
+    padding: 10px 20px;
+    color: white;
+}
+
+.guest-nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+.guest-nav-links li {
+    display: inline;
+}
+
+.guest-nav-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.guest-nav-links a i {
+    margin-left: 8px;
+}
+
+/* Login modal styles */
+#login-prompt-modal .modal-content {
+    max-width: 400px;
+    text-align: center;
+    padding: 40px;
+}
+
+#login-prompt-modal h2 {
+    color: #333;
+    margin-top: 0;
+}
+
+#login-prompt-modal p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+#login-prompt-modal .login-btn {
+    margin-top: 20px;
+    display: inline-flex;
+    align-items: center;
+}
+
+#login-prompt-modal .login-btn i {
+    margin-right: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .guest-banner h1 {
+        font-size: 28px;
+    }
+
+    .guest-banner p {
+        font-size: 16px;
+    }
+
+    .login-btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}

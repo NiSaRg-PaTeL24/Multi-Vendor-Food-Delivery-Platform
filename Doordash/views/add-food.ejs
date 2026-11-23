@@ -1,0 +1,24 @@
+<h2>Add a New Food Item (DoorDash)</h2>
+<form action="/add-food" method="POST" class="food-form">
+    <div class="form-group">
+        <label for="name">🍔 Food Name:</label>
+        <input type="text" id="name" name="name" required placeholder="Enter food name">
+    </div>
+
+    <div class="form-group">
+        <label for="restaurant">🏬 Provider Restaurant:</label>
+        <input type="text" id="restaurant" name="restaurant" required placeholder="Enter restaurant name">
+    </div>
+
+    <div class="form-group">
+        <label for="price">💰 Price ($):</label>
+        <input type="number" id="price" name="price" step="0.01" required placeholder="Enter price">
+    </div>
+
+    <div class="form-group checkbox-group">
+        <input type="checkbox" id="available" name="available">
+        <label for="available">✅ Available</label>
+    </div>
+
+    <button type="submit" class="submit-btn">➕ Add Food</button>
+</form>

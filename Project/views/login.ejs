@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .auth0-button {
+            display: block;
+            width: 100%;
+            background-color: #EB5424;
+            color: white;
+            border: none;
+            padding: 12px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .auth0-button:hover {
+            background-color: #D44A1A;
+        }
+
+        .auth0-icon {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #777;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .divider span {
+            padding: 0 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">FoodDelivery</div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/register">Register</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h2>Welcome to FoodDelivery</h2>
+        
+        <a href="/auth/login" class="auth0-button">
+            <span class="auth0-icon"><i class="fas fa-lock"></i></span>
+            Login with Auth0
+        </a>
+        
+        <div class="divider">
+            <span>or login with email</span>
+        </div>
+        
+        <% if (error) { %>
+            <p class="error"><%= error %></p>
+        <% } %>
+        <form action="/login" method="POST">
+            <input type="email" name="email" placeholder="Email" required>
+            <div class="password-container">
+                <input type="password" id="password" name="password" placeholder="Password" required>
+                <div class="show-password-container">
+                    <input type="checkbox" id="showPassword"> 
+                    <label for="showPassword">Show Password</label>
+                </div>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="/register">Register here</a></p>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 FoodDelivery. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // JavaScript to toggle password visibility
+        const showPasswordCheckbox = document.getElementById('showPassword');
+        const passwordField = document.getElementById('password');
+
+        showPasswordCheckbox.addEventListener('change', function() {
+            if (showPasswordCheckbox.checked) {
+                passwordField.type = 'text';
+            } else {
+                passwordField.type = 'password';
+            }
+        });
+    </script>
+</body>
+
+</html>
